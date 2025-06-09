@@ -1,0 +1,19 @@
+first step
+    npm init
+Second
+    create two folder src & public
+
+in src folder create 
+    Controller
+    DB
+    MiddleWare
+    Models
+    Routes
+    Utils
+    App.js     main file
+    Index.js   enter port run 
+
+
+
+
+

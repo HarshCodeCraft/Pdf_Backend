@@ -1,0 +1,32 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your OTP Code</title>
+    <style>
+      body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin:
+      0; padding: 20px; } .container { background-color: #ffffff; max-width:
+      600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px
+      8px rgba(0,0,0,0.1); } h3 { color: #333333; } .otp-code { display:
+      inline-block; background-color: #007bff; color: #ffffff; font-size: 24px;
+      font-weight: bold; letter-spacing: 4px; padding: 10px 20px; margin: 20px
+      0; border-radius: 6px; } p { color: #555555; font-size: 16px; } .footer {
+      margin-top: 30px; font-size: 14px; color: #888888; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Hello {{userEmail}},</h3>
+
+      <p>You requested a One-Time Password (OTP) to verify your identity. Please
+        use the code below to proceed:</p>
+
+      <div class="otp-code">{{otp}}</div>
+
+      <p>This OTP is valid for the next 10 minutes. Please do not share it with
+        anyone.</p>
+
+      <p class="footer">Best regards,<br />Your App Team</p>
+    </div>
+  </body>
+</html>
