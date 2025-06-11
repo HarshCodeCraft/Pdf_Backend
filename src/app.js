@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import PdfRouter from "./Routes/Pdf.routes.js"
-import UserRoutes from "./Routes/Users.routes.js"
-import AdminRoutes from "./Routes/Admin.routes.js"
+import PdfRouter from "./routes/Pdf.routes.js"
+import UserRoutes from "./routes/Users.routes.js"
+import AdminRoutes from "./routes/Admin.routes.js"
 
 const app = express();
 dotenv.config();

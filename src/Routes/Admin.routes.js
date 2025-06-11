@@ -7,7 +7,7 @@ import {
   addUserAndSendPasskey,
   verifyForgotPasswordOtp,
   resetAdminPassword
-} from "../controllers/Admin.controller.js";
+} from "../Controllers/Admin.controller.js";
 
 const router = express.Router();
 
