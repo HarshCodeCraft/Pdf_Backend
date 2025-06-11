@@ -7,7 +7,7 @@ import {
   addIpToPdf,
   getSinglePdfData,
 } from "../Controllers/Pdf.controller.js";
-import { upload } from "../middlewares/multer.middleware.js";
+import { upload } from "../Middlewares/multer.middleware.js";
 import multer from "multer";
 const formate = multer();
 
