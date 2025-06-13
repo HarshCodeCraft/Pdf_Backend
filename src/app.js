@@ -10,7 +10,7 @@ const app = express();
 
 dotenv.config();
 
-// app.set('trust proxy', true);
+app.set('trust proxy', true);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
