@@ -7,7 +7,10 @@ import UserRoutes from "./Routes/Users.routes.js"
 import AdminRoutes from "./Routes/Admin.routes.js"
 
 const app = express();
+
 dotenv.config();
+
+// app.set('trust proxy', true);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,

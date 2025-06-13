@@ -21,8 +21,8 @@ router.delete("/delete/:id", deletePdfById);
 router.post("/access/:pdfId", accessPdfByUser);
 router.post("/view-one/:id", getSinglePdfData);
 router.get("/ip", (req, res) => {
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+  console.log("HEADERS:", req.headers);
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
   res.json({ ip });
 });
 

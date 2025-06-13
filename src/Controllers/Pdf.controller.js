@@ -43,6 +43,8 @@ import { Users } from "../Models/Users.model.js";
 export const PdfAdd = async (req, res) => {
   try {
     const { expiryTime, userLimit } = req.body;
+    console.log("Files received:", req.file);
+    console.log("Body:", req.body);
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -52,9 +54,11 @@ export const PdfAdd = async (req, res) => {
 
     const filePath = `/uploads/${req.file.filename}`;
 
+    const expiryUTC = new Date(expiryTime);
+
     const newPdf = new Pdf({
       filePath,
-      expiryTime,
+      expiryTime:expiryUTC,
       userLimit,
       uploadedBy: req.user?._id || null,
     });
@@ -121,22 +125,102 @@ export const accessPdfByUser = async (req, res) => {
   }
 };
 
-// View All PDFs Controller
-export const PdfView = async (req, res) => {
+// controllers/pdfController.js
+// export const addIpToPdf = async (req, res) => {
+//   const { id } = req.params;
+//   const { ip, deviceId } = req.body;
+
+//   try {
+//     const pdf = await Pdf.findById(id);
+//     if (!pdf) return res.status(404).json({ message: "PDF not found" });
+
+//     if (!pdf.accessList) {
+//       pdf.accessList = [];
+//     }
+
+//     // Check if this deviceId is already in accessList
+//     const alreadyExists = pdf.accessList.some(
+//       (entry) => entry.deviceId === deviceId
+//     );
+
+//     if (alreadyExists) {
+//       return res.status(200).json({ message: "Already accessed" });
+//     }
+
+//     // Enforce userLimit
+//     if (pdf.accessList.length >= pdf.userLimit) {
+//       return res.status(403).json({ message: "User limit exceeded" });
+//     }
+
+//     // Save access with timestamp
+//     pdf.accessList.push({
+//       ip,
+//       deviceId,
+//       accessedAt: new Date(),
+//     });
+
+//     await pdf.save();
+
+//     res.status(200).json({
+//       message: "Access granted",
+//       accessList: pdf.accessList,
+//     });
+//   } catch (err) {
+//     console.error("Error adding access:", err);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+export const addIpToPdf = async (req, res) => {
+  const { id } = req.params;
+  const { ip, deviceId } = req.body;
+
+  if (!ip || !deviceId) {
+    return res.status(400).json({ message: "Missing device ID or IP" });
+  }
+
   try {
-    const pdfs = await Pdf.find();
-    //   .populate("uploadedBy", "name email")
-    //   .sort({ createdAt: -1 });
+    const pdf = await Pdf.findById(id);
+    if (!pdf) return res.status(404).json({ message: "PDF not found" });
+
+    if (!pdf.accessList) pdf.accessList = [];
+
+    const alreadyExists = pdf.accessList.find(
+      (entry) => entry.deviceId === deviceId
+    );
+
+    if (!alreadyExists) {
+      if (pdf.accessList.length >= pdf.userLimit) {
+        return res.status(403).json({ message: "User limit exceeded" });
+      }
+
+      pdf.accessList.push({
+        ip,
+        deviceId,
+        accessedAt: new Date(),
+      });
+
+      await pdf.save();
+    }
 
     res.status(200).json({
-      message: "PDFs fetched successfully",
-      data: pdfs,
+      message: "Access granted",
+      accessList: pdf.accessList,
     });
-  } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
+  } catch (err) {
+    console.error("Error adding access:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getSinglePdfData = async (req, res) => {
+  try {
+    const pdf = await Pdf.findById(req.params.id);
+    if (!pdf) return res.status(404).json({ message: "PDF not found" });
+
+    res.status(200).json({ data: pdf });
+  } catch (err) {
+    console.error("Error fetching single PDF:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -165,60 +249,21 @@ export const deletePdfById = async (req, res) => {
   }
 };
 
-// controllers/pdfController.js
-export const addIpToPdf = async (req, res) => {
-  const { id } = req.params;
-  const { ip, deviceId } = req.body;
-
+// View All PDFs Controller
+export const PdfView = async (req, res) => {
   try {
-    const pdf = await Pdf.findById(id);
-    if (!pdf) return res.status(404).json({ message: "PDF not found" });
-
-    if (!pdf.accessList) {
-      pdf.accessList = [];
-    }
-
-    // Check if this deviceId is already in accessList
-    const alreadyExists = pdf.accessList.some(
-      (entry) => entry.deviceId === deviceId
-    );
-
-    if (alreadyExists) {
-      return res.status(200).json({ message: "Already accessed" });
-    }
-
-    // Enforce userLimit
-    if (pdf.accessList.length >= pdf.userLimit) {
-      return res.status(403).json({ message: "User limit exceeded" });
-    }
-
-    // Save access with timestamp
-    pdf.accessList.push({
-      ip,
-      deviceId,
-      accessedAt: new Date(),
-    });
-
-    await pdf.save();
+    const pdfs = await Pdf.find();
+    //   .populate("uploadedBy", "name email")
+    //   .sort({ createdAt: -1 });
 
     res.status(200).json({
-      message: "Access granted",
-      accessList: pdf.accessList,
+      message: "PDFs fetched successfully",
+      data: pdfs,
     });
-  } catch (err) {
-    console.error("Error adding access:", err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-export const getSinglePdfData = async (req, res) => {
-  try {
-    const pdf = await Pdf.findById(req.params.id);
-    if (!pdf) return res.status(404).json({ message: "PDF not found" });
-
-    res.status(200).json({ data: pdf });
-  } catch (err) {
-    console.error("Error fetching single PDF:", err);
-    res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
