@@ -252,9 +252,18 @@ export const deletePdfById = async (req, res) => {
 // View All PDFs Controller
 export const PdfView = async (req, res) => {
   try {
+    const userAgent = req.headers['user-agent'] || '';
+
+    // Detect browser access
+    const isBrowser = /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent);
+
+    if (isBrowser) {
+      return res.redirect(
+        "https://play.google.com/store/apps/details?id=com.harshu_07.boltexponativewind"
+      );
+    }
+
     const pdfs = await Pdf.find();
-    //   .populate("uploadedBy", "name email")
-    //   .sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "PDFs fetched successfully",
