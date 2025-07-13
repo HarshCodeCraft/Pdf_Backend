@@ -8,20 +8,17 @@ import PdfRouter from "./Routes/Pdf.routes.js"
 import UserRoutes from "./Routes/Users.routes.js"
 import AdminRoutes from "./Routes/Admin.routes.js"
 
-// Setup __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 dotenv.config();
-
-// ✅ Serve assetlinks.json manually with correct Content-Type
 app.get('/.well-known/assetlinks.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.sendFile(path.join(__dirname, '../public/.well-known/assetlinks.json'));
 });
 
-app.use(express.static(path.join(__dirname, "../public")));  // ✅ Correct
+app.use(express.static(path.join(__dirname, "../public"))); 
 
 app.set('trust proxy', true);
 
