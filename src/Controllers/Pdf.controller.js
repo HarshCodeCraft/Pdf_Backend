@@ -125,51 +125,6 @@ export const accessPdfByUser = async (req, res) => {
   }
 };
 
-// controllers/pdfController.js
-// export const addIpToPdf = async (req, res) => {
-//   const { id } = req.params;
-//   const { ip, deviceId } = req.body;
-
-//   try {
-//     const pdf = await Pdf.findById(id);
-//     if (!pdf) return res.status(404).json({ message: "PDF not found" });
-
-//     if (!pdf.accessList) {
-//       pdf.accessList = [];
-//     }
-
-//     // Check if this deviceId is already in accessList
-//     const alreadyExists = pdf.accessList.some(
-//       (entry) => entry.deviceId === deviceId
-//     );
-
-//     if (alreadyExists) {
-//       return res.status(200).json({ message: "Already accessed" });
-//     }
-
-//     // Enforce userLimit
-//     if (pdf.accessList.length >= pdf.userLimit) {
-//       return res.status(403).json({ message: "User limit exceeded" });
-//     }
-
-//     // Save access with timestamp
-//     pdf.accessList.push({
-//       ip,
-//       deviceId,
-//       accessedAt: new Date(),
-//     });
-
-//     await pdf.save();
-
-//     res.status(200).json({
-//       message: "Access granted",
-//       accessList: pdf.accessList,
-//     });
-//   } catch (err) {
-//     console.error("Error adding access:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
 export const addIpToPdf = async (req, res) => {
   const { id } = req.params;
   const { ip, deviceId } = req.body;
@@ -250,12 +205,41 @@ export const deletePdfById = async (req, res) => {
 };
 
 // View All PDFs Controller
+// export const PdfView = async (req, res) => {
+//   try {
+//     const userAgent = req.headers['user-agent'] || '';
+
+//     // Detect browser access
+//     const isBrowser = /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent);
+
+//     if (isBrowser) {
+//       return res.redirect(
+//         "https://play.google.com/store/apps/details?id=com.harshu_07.boltexponativewind"
+//       );
+//     }
+
+//     const pdfs = await Pdf.find();
+
+//     res.status(200).json({
+//       message: "PDFs fetched successfully",
+//       data: pdfs,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
 export const PdfView = async (req, res) => {
   try {
     const userAgent = req.headers['user-agent'] || '';
+    const accept = req.headers['accept'] || '';
 
-    // Detect browser access
-    const isBrowser = /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent);
+    const isBrowser =
+      /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent) &&
+      accept.includes('text/html');
 
     if (isBrowser) {
       return res.redirect(
