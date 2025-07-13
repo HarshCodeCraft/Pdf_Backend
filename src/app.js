@@ -15,6 +15,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 dotenv.config();
+
+// ✅ Serve assetlinks.json manually with correct Content-Type
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.sendFile(path.join(__dirname, '../public/.well-known/assetlinks.json'));
+});
 app.use(express.static(path.join(__dirname, "../public"))); 
 
 app.set('trust proxy', true);
