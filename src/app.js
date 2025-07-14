@@ -46,8 +46,8 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
     return res.status(404).json({ error: "assetlinks.json not found" });
   }
 
-  res.setHeader('Content-Type', 'application/json');
-  res.sendFile(assetLinksPath);
+res.status(200).type('application/json').sendFile(assetLinksPath);
+
 });
 
 // Static frontend serving (React build)
