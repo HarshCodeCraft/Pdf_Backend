@@ -16,6 +16,7 @@ const router = Router();
 // POST: Upload PDF with metadata
 router.post("/upload", upload.single("pdf"), PdfAdd);
 router.get("/view", PdfView);
+router.get("/details", PdfView);
 router.put("/add-ip/:id", formate.none(), addIpToPdf);
 router.delete("/delete/:id", deletePdfById);
 router.post("/access/:pdfId", accessPdfByUser);
