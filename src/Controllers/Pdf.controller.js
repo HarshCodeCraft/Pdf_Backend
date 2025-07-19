@@ -1,5 +1,7 @@
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
+import fs from "fs/promises";
+import path from "path";
 
 // Add PDF Controller
 // export const PdfAdd = async (req, res) => {
@@ -180,23 +182,85 @@ export const getSinglePdfData = async (req, res) => {
 };
 
 // Delete PDF by ID Controller
+// export const deletePdfById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const deletedPdf = await Pdf.findByIdAndDelete(id);
+
+//     if (!deletedPdf) {
+//       return res.status(404).json({
+//         message: "PDF not found",
+//       });
+//     }
+
+//     res.status(200).json({
+//       message: "PDF deleted successfully",
+//       data: deletedPdf,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
 export const deletePdfById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedPdf = await Pdf.findByIdAndDelete(id);
+    // Get the doc first so we still have the path after deletion
+    const pdfDoc = await Pdf.findById(id);
+    if (!pdfDoc) {
+      return res.status(404).json({ message: "PDF not found" });
+    }
 
-    if (!deletedPdf) {
-      return res.status(404).json({
-        message: "PDF not found",
-      });
+    // Capture stored path (e.g. "/uploads/123.pdf")
+    const storedPath = pdfDoc.filePath; // may start with "/uploads/"
+    let diskPath;
+
+    if (storedPath) {
+      // Remove leading slash so join works predictably
+      // "/uploads/x.pdf" -> "uploads/x.pdf"
+      const rel = storedPath.startsWith("/") ? storedPath.slice(1) : storedPath;
+
+      // Guard against path traversal: normalize & ensure it stays under uploads
+      const normalized = path.normalize(rel); // e.g., "uploads/x.pdf"
+      const uploadsRoot = path.join(process.cwd(), "public", "uploads");
+      diskPath = path.join(process.cwd(), "public", normalized);
+
+      // Extra safety: confirm resolved path is inside uploadsRoot
+      if (!diskPath.startsWith(uploadsRoot)) {
+        console.warn("Refusing to delete outside uploads dir:", diskPath);
+        diskPath = null;
+      }
+    }
+
+    // Delete the DB record
+    await Pdf.deleteOne({ _id: id });
+
+    // Best-effort file delete
+    if (diskPath) {
+      try {
+        await fs.unlink(diskPath);
+        console.log("Deleted file:", diskPath);
+      } catch (err) {
+        if (err.code === "ENOENT") {
+          console.warn("File not found on disk:", diskPath);
+        } else {
+          console.error("Error deleting file:", err);
+        }
+      }
+    } else {
+      console.warn("No valid disk path for PDF id:", id);
     }
 
     res.status(200).json({
       message: "PDF deleted successfully",
-      data: deletedPdf,
+      data: pdfDoc, // returning the doc that was deleted
     });
   } catch (error) {
+    console.error("deletePdfById error:", error);
     res.status(500).json({
       message: "Server error",
       error: error.message,
@@ -232,22 +296,41 @@ export const deletePdfById = async (req, res) => {
 //   }
 // };
 
+// export const PdfView = async (req, res) => {
+//   try {
+//     const userAgent = req.headers['user-agent'] || '';
+//     const accept = req.headers['accept'] || '';
+
+//     const isBrowser =
+//       /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent) &&
+//       accept.includes('text/html');
+
+//     if (isBrowser) {
+//       return res.redirect(
+//         "https://play.google.com/store/apps/details?id=com.harshu_07.boltexponativewind"
+//       );
+//     }
+
+//     const pdfs = await Pdf.find();
+
+//     res.status(200).json({
+//       message: "PDFs fetched successfully",
+//       data: pdfs,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// View All PDFs Controller
 export const PdfView = async (req, res) => {
   try {
-    const userAgent = req.headers['user-agent'] || '';
-    const accept = req.headers['accept'] || '';
-
-    const isBrowser =
-      /Chrome|Safari|Firefox|Edg|Mozilla/i.test(userAgent) &&
-      accept.includes('text/html');
-
-    if (isBrowser) {
-      return res.redirect(
-        "https://play.google.com/store/apps/details?id=com.harshu_07.boltexponativewind"
-      );
-    }
-
     const pdfs = await Pdf.find();
+    //   .populate("uploadedBy", "name email")
+    //   .sort({ createdAt: -1 });
 
     res.status(200).json({
       message: "PDFs fetched successfully",
@@ -257,6 +340,6 @@ export const PdfView = async (req, res) => {
     res.status(500).json({
       message: "Server error",
       error: error.message,
-    });
-  }
+    });
+  }
 };
