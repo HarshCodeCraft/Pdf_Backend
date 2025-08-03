@@ -26,5 +26,6 @@ router.get("/ip", (req, res) => {
   const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
   res.json({ ip });
 });
+router.get("/direct/:id", formate.none(),PdfDirect);
 
 export default router;
