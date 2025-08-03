@@ -6,6 +6,7 @@ import {
   accessPdfByUser,
   addIpToPdf,
   getSinglePdfData,
+  PdfDirect,
 } from "../Controllers/Pdf.controller.js";
 import { upload } from "../Middlewares/multer.middleware.js";
 import multer from "multer";
