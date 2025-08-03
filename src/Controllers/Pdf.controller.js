@@ -6,7 +6,7 @@ import path from "path";
 import requestIp from "request-ip";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 export const PdfDirect = async (req, res) => {
   const { id } = req.params;
